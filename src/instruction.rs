@@ -2,12 +2,14 @@
 pub enum Opcode {
     HLT,
     IGL,
+    LOAD,
 }
 
 impl From<u8> for Opcode {
     fn from(v: u8) -> Self {
         match v {
             0 => return Opcode::HLT,
+            1 => return Opcode::LOAD,
             _ => return Opcode::IGL,
         }
     }
