@@ -15,57 +15,58 @@ impl VM {
             pc: 0,
         }
     }
+
     fn next_8_bits(&mut self) -> u8 {
         let result = self.program[self.pc];
         self.pc += 1;
-        return result;
+        result
     }
-    
+
     fn next_16_bits(&mut self) -> u16 {
         let result = ((self.program[self.pc] as u16) << 8) | self.program[self.pc + 1] as u16;
         self.pc += 2;
-        return result;
+        result
     }
 
     pub fn run(&mut self) {
         let mut is_done = false;
         while !is_done {
+            println!("Executing at pc: {}", self.pc);
             is_done = self.execute_instruction();
         }
     }
-    
+
     pub fn run_once(&mut self) {
         self.execute_instruction();
     }
-    
-    
+
     fn execute_instruction(&mut self) -> bool {
         if self.pc >= self.program.len() {
-            return false;
+            return true;
         }
-        let opcode = self.decode_opcode();
-        match opcode {
+        match self.decode_opcode() {
             Opcode::LOAD => {
                 let register = self.next_8_bits() as usize;
                 let number = self.next_16_bits() as i32;
+                println!("LOAD {} into register {}", number, register);
                 self.registers[register] = number;
             },
             Opcode::HLT => {
                 println!("HLT encountered");
-                return false;
+                return true;
             },
             Opcode::IGL => {
                 println!("Unknown opcode encountered at {}", self.pc - 1);
-                return false;
+                return true;
             },
         }
-        true
+        false
     }
 
     fn decode_opcode(&mut self) -> Opcode {
-        let opcode_byte = self.program[self.pc];
+        let opcode = Opcode::from(self.program[self.pc]);
         self.pc += 1;
-        Opcode::from(opcode_byte)
+        opcode
     }
 }
 
@@ -76,13 +77,13 @@ mod tests {
     #[test]
     fn test_create_vm() {
         let test_vm = VM::new();
-        assert_eq!(test_vm.registers[0], 0)
+        assert_eq!(test_vm.registers[0], 0);
     }
 
     #[test]
     fn test_opcode_hlt() {
         let mut test_vm = VM::new();
-        let test_bytes = vec![0, 0, 0, 0];
+        let test_bytes = vec![0];
         test_vm.program = test_bytes;
         test_vm.run();
         assert_eq!(test_vm.pc, 1);
@@ -103,5 +104,5 @@ mod tests {
         test_vm.program = test_bytes;
         test_vm.run_once();
         assert_eq!(test_vm.pc, 1);
-    }
+    } 
 }
