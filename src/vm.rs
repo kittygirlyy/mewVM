@@ -51,6 +51,12 @@ impl VM {
                 println!("LOAD {} into register {}", number, register);
                 self.registers[register] = number;
             },
+            Opcode::ADD => {
+                let register1 = self.registers[self.next_8_bits() as usize];
+                let register2 = self.registers[self.next_8_bits() as usize];
+                self.registers[self.next_8_bits() as usize] = register1 + register2;
+                println!("ADD result: {} + {} = {}", register1, register2, register1 + register2);
+            },
             Opcode::HLT => {
                 println!("HLT encountered");
                 return true;
@@ -98,11 +104,21 @@ mod tests {
     }
 
     #[test]
+    fn test_opcode_add() {
+        let mut test_vm = VM::new();
+        test_vm.registers[0] = 5;
+        test_vm.registers[1] = 10;
+        test_vm.program = vec![2, 0, 1, 2];
+        test_vm.run_once();
+        assert_eq!(test_vm.registers[2], 15);
+    }
+
+    #[test]
     fn test_opcode_igl() {
         let mut test_vm = VM::new();
         let test_bytes = vec![200, 0, 0, 0];
         test_vm.program = test_bytes;
         test_vm.run_once();
         assert_eq!(test_vm.pc, 1);
-    } 
+    }
 }
