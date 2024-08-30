@@ -5,14 +5,16 @@ pub struct VM {
     registers: [i32; 32],
     pc: usize,
     program: Vec<u8>,
+    remainder: u32,
 }
 
 impl VM {
     pub fn new() -> VM {
         VM {
             registers: [0; 32],
-            program: vec![],
             pc: 0,
+            program: vec![],
+            remainder: 0,
         }
     }
 
@@ -62,6 +64,20 @@ impl VM {
                 let register2 = self.registers[self.next_8_bits() as usize];
                 self.registers[self.next_8_bits() as usize] = register1 * register2;
                 println!("MUL result: {} * {} = {}", register1, register2, register1 * register2);
+            },
+            Opcode::DIV => {
+                let register1 = self.registers[self.next_8_bits() as usize];
+                let register2 = self.registers[self.next_8_bits() as usize];
+                let dest = self.next_8_bits() as usize;
+                if register2 != 0 {
+                    self.registers[dest] = register1 / register2;
+                    self.remainder = (register1 % register2) as u32;
+                    println!("DIV result: {} / {} = {}, remainder = {}", register1, register2, self.registers[dest], self.remainder);
+                } else {
+                    println!("Error: Division by zero");
+                    self.registers[dest] = 0;
+                    self.remainder = register1 as u32;
+                }
             },
             Opcode::HLT => {
                 println!("HLT encountered");
@@ -136,5 +152,27 @@ mod tests {
         test_vm.program = vec![3, 0, 1, 2];
         test_vm.run_once();
         assert_eq!(test_vm.registers[2], 50);
+    }
+
+    #[test]
+    fn test_opcode_div() {
+        let mut test_vm = VM::new();
+        test_vm.registers[0] = 10;
+        test_vm.registers[1] = 3;
+        test_vm.program = vec![4, 0, 1, 2];
+        test_vm.run_once();
+        assert_eq!(test_vm.registers[2], 3);
+        assert_eq!(test_vm.remainder, 1);
+    }
+
+    #[test]
+    fn test_opcode_div_by_zero() {
+        let mut test_vm = VM::new();
+        test_vm.registers[0] = 10;
+        test_vm.registers[1] = 0;
+        test_vm.program = vec![4, 0, 1, 2];
+        test_vm.run_once();
+        assert_eq!(test_vm.registers[2], 0);
+        assert_eq!(test_vm.remainder, 10);
     }
 }

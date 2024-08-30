@@ -4,6 +4,7 @@ pub enum Opcode {
     LOAD,
     ADD,
     MUL,
+    DIV,
     IGL,
 }
 
@@ -14,6 +15,7 @@ impl From<u8> for Opcode {
             1 => Opcode::LOAD,
             2 => Opcode::ADD,
             3 => Opcode::MUL,
+            4 => Opcode::DIV,
             _ => Opcode::IGL,
         }
     }
