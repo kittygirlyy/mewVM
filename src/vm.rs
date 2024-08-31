@@ -79,6 +79,11 @@ impl VM {
                     self.remainder = register1 as u32;
                 }
             },
+            Opcode::JMP => {
+                let address = self.next_16_bits() as usize;
+                println!("Jumping to absolute address {}", address);
+                self.pc = address;
+            },
             Opcode::HLT => {
                 println!("HLT encountered");
                 return true;
@@ -89,7 +94,7 @@ impl VM {
             },
         }
         false
-    }
+    }    
 
     fn decode_opcode(&mut self) -> Opcode {
         let opcode = Opcode::from(self.program[self.pc]);
@@ -175,4 +180,12 @@ mod tests {
         assert_eq!(test_vm.registers[2], 0);
         assert_eq!(test_vm.remainder, 10);
     }
+
+    #[test]
+    fn test_opcode_jmp() {
+        let mut test_vm = VM::new();
+        test_vm.program = vec![5, 0, 10];
+        test_vm.run_once();
+        assert_eq!(test_vm.pc, 10);
+    } 
 }
