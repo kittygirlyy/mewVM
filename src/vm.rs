@@ -84,6 +84,13 @@ impl VM {
                 println!("Jumping to absolute address {}", address);
                 self.pc = address;
             },
+            Opcode::SUB => {
+                let register1 = self.registers[self.next_8_bits() as usize];
+                let register2 = self.registers[self.next_8_bits() as usize];
+                let destination = self.next_8_bits() as usize;
+                self.registers[destination] = register1 - register2;
+                println!("SUB result: {} - {} = {}", register1, register2, self.registers[destination]);
+            },
             Opcode::HLT => {
                 println!("HLT encountered");
                 return true;
@@ -94,7 +101,7 @@ impl VM {
             },
         }
         false
-    }    
+    }
 
     fn decode_opcode(&mut self) -> Opcode {
         let opcode = Opcode::from(self.program[self.pc]);
@@ -187,5 +194,15 @@ mod tests {
         test_vm.program = vec![5, 0, 10];
         test_vm.run_once();
         assert_eq!(test_vm.pc, 10);
-    } 
+    }
+
+    #[test]
+    fn test_opcode_sub() {
+        let mut test_vm = VM::new();
+        test_vm.registers[0] = 10;
+        test_vm.registers[1] = 3;
+        test_vm.program = vec![6, 0, 1, 2];
+        test_vm.run_once();
+        assert_eq!(test_vm.registers[2], 7);
+    }
 }
