@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://media1.tenor.com/m/Es_130XuwsAAAAAC/anime-cat.gif" alt="mewvm" height="200" />
+  <img src="https://media.tenor.com/OHMxfMcU4eQAAAAi/anime-girl.gif" alt="mewvm" height="200" />
 </p>
 
 # 🐾 MewVM
